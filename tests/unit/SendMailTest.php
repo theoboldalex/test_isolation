@@ -19,8 +19,7 @@ class SendMailTest extends TestCase
         array $recipientData,
         string $fileUrl,
         array $expected,
-    ): void
-    {
+    ): void {
         // Arrange
         $recipientMock = $this->createMock(PostRecipient::class);
         $letterMock = $this->createMock(PostLetter::class);
