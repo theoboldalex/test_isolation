@@ -13,5 +13,9 @@
         "psr-4": {
             "App\\": "tests"
         }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.5",
+        "clicksend/clicksend-php": "^5.0"
     }
 }
