@@ -1,0 +1,5 @@
+.phpunit.*
+vendor/
+.vscode/*
+.idea/*
+.phpcs-cache

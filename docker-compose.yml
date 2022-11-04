@@ -1,0 +1,7 @@
+services:
+  php:
+    build: docker/php/
+    environment:
+      XDEBUG_MODE: "coverage"
+    volumes:
+      - ".:/var/www/"
