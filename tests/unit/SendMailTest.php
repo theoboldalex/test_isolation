@@ -41,7 +41,7 @@ class SendMailTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function letterDataProvider():  Generator
+    public function letterDataProvider(): Generator
     {
         yield 'send a letter to santa claus' => [
             [
