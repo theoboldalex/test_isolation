@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aed55751d708c98ede6eff40bcf1adaf",
+    "content-hash": "398c0db5e06053ee285b948d19be6e44",
     "packages": [
         {
             "name": "clicksend/clicksend-php",

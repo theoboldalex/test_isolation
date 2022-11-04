@@ -16,6 +16,7 @@
     },
     "require": {
         "vlucas/phpdotenv": "^5.5",
-        "clicksend/clicksend-php": "^5.0"
+        "clicksend/clicksend-php": "^5.0",
+        "guzzlehttp/guzzle": "^7.5"
     }
 }
