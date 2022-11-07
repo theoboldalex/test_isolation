@@ -44,9 +44,16 @@ class SendMailTest extends TestCase
     {
         yield 'send a letter to santa claus' => [
             [
-                'address_name' => 'Santa Claus'
+                'address_name' => 'Santa Claus',
+                'address_line_one' => '1 Lapland Way',
+                'address_line_two' => 'The North Pole',
+                'address_city' => 'Smorgasborg',
+                'address_state' => 'Phpville',
+                'address_postal_code' => '11111',
+                'address_country' => 'Greenland',
             ],
-            self::LETTER_PATH . 'santa.pdf',
+            /* self::LETTER_PATH . 'santa.pdf', */
+            'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
             []
         ];
     }
