@@ -43,7 +43,7 @@ class SendMail
         $this->postLetter->setRecipients([$this->postRecipient]);
     }
 
-    public function sendLetter(): array
+    public function sendLetter(): string
     {
         return $this->apiInstance->postLettersSendPost($this->postLetter);
     }

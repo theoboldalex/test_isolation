@@ -41,7 +41,7 @@ class SendMailTest extends TestCase
         $sut->attachLetter($fileUrl);
 
         // Act
-        $result = $sut->sendLetter();
+        $result = json_decode($sut->sendLetter(), true);
 
         // Assert
         foreach ($expected as $value) {
@@ -72,7 +72,7 @@ class SendMailTest extends TestCase
 
     private function getMockResponse()
     {
-        return json_decode(file_get_contents(__DIR__ . '/fixtures/responses/send_letter_response.json'), true);
+        return file_get_contents(__DIR__ . '/fixtures/responses/send_letter_response.json');
     }
 }
 
