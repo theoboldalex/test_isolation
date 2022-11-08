@@ -14,27 +14,11 @@ use GuzzleHttp\Client;
 
 class SendMail
 {
-    private Configuration $config;
-    private PostLetterApi $apiInstance;
-
     public function __construct(
+        private PostLetterApi $apiInstance,
         private PostRecipient $postRecipient,
         private PostLetter $postLetter,
     ) {
-        // Some required setup. This wouldn't usually live here.
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->load();
-
-        $this->config = Configuration::getDefaultConfiguration()
-             ->setUsername($_ENV['CLICKSEND_KEY'])
-             ->setPassword($_ENV['CLICKSEND_SECRET']);
-
-        $this->initApiInstance();
-    }
-
-    private function initApiInstance(): void
-    {
-        $this->apiInstance = new PostLetterApi(new Client(), $this->config);
     }
 
     /** @param string[] $recipient */
@@ -59,7 +43,7 @@ class SendMail
         $this->postLetter->setRecipients([$this->postRecipient]);
     }
 
-    public function sendLetter(): string
+    public function sendLetter(): array
     {
         return $this->apiInstance->postLettersSendPost($this->postLetter);
     }

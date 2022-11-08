@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\SendMail;
+use ClickSend\Api\PostLetterApi;
 use ClickSend\Model\PostLetter;
 use ClickSend\Model\PostRecipient;
 use Generator;
@@ -21,11 +22,17 @@ class SendMailTest extends TestCase
         array $expected,
     ): void {
         // Arrange
+        $apiMock = $this->createMock(PostLetterApi::class);
         $recipientMock = $this->createMock(PostRecipient::class);
         $letterMock = $this->createMock(PostLetter::class);
 
+        $apiMock->expects($this->once())
+            ->method('postLettersSendPost')
+            ->willReturn($this->getMockResponse());
+
         // $sut = System Under Test aka the class/module we are isolating as a unit
         $sut = new SendMail(
+            $apiMock,
             $recipientMock, 
             $letterMock,
         );
@@ -37,7 +44,9 @@ class SendMailTest extends TestCase
         $result = $sut->sendLetter();
 
         // Assert
-        $this->assertSame($expected, $result);
+        foreach ($expected as $value) {
+            $this->assertContains($value, $result);
+        }
     }
 
     public function letterDataProvider(): Generator
@@ -52,10 +61,18 @@ class SendMailTest extends TestCase
                 'address_postal_code' => '11111',
                 'address_country' => 'Greenland',
             ],
-            /* self::LETTER_PATH . 'santa.pdf', */
             'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-            []
+            [
+                'http_code' => 200,
+                'response_code' => 'SUCCESS',
+                'response_msg' => 'Letters queued for delivery.',
+            ]
         ];
+    }
+
+    private function getMockResponse()
+    {
+        return json_decode(file_get_contents(__DIR__ . '/fixtures/responses/send_letter_response.json'), true);
     }
 }
 
