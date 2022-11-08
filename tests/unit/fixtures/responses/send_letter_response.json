@@ -27,9 +27,9 @@
         "priority_post": 0,
         "date_added": 1667850004,
         "status": "INVALID_COUNTRY",
-        "_file_url": "https://clicksend-api-downloads.s3.ap-southeast-2.amazonaws.com/_private/396ED1D3-3095-45CE-B166-07E726B44373.pdf?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWKMIV4OKLNEYMPU5%2F20221107%2Fap-southeast-2%2Fs3%2Faws4_request&X-Amz-Date=20221107T194004Z&X-Amz-SignedHeaders=host&X-Amz-Expires=1800&X-Amz-Signature=108275996a31991f50a786b8bbe9f47b03ec9045e966704d471ecd7019ae49b5",
+        "_file_url": "https://clicksend-api-downloads.s3.ap-southeast-2.amazonaws.com/test",
         "_return_address": null,
-        "_api_username": "theoboldalex@gmail.com"
+        "_api_username": "test_env@gmail.com"
       }
     ],
     "_currency": {
