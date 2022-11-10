@@ -1,0 +1,44 @@
+{
+  "http_code": 200,
+  "response_code": "SUCCESS",
+  "response_msg": "Letters queued for delivery.",
+  "data": {
+    "total_price": 0,
+    "total_count": 1,
+    "queued_count": 0,
+    "recipients": [
+      {
+        "user_id": 375476,
+        "subaccount_id": 425604,
+        "message_id": "760AFC6F-9F07-4E08-B807-FE64ECA16F53",
+        "address_name": "Santa Claus",
+        "address_line_1": "1 Lapland Way",
+        "address_line_2": "The North Pole",
+        "address_city": "Smorgasborg",
+        "address_state": "Phpville",
+        "address_postal_code": "11111",
+        "address_country": "Greenland",
+        "schedule": 1667850003,
+        "source": "sdk",
+        "colour": 0,
+        "duplex": 0,
+        "post_pages": 0,
+        "post_price": "0.0000",
+        "priority_post": 0,
+        "date_added": 1667850004,
+        "status": "INVALID_COUNTRY",
+        "_file_url": "https://clicksend-api-downloads.s3.ap-southeast-2.amazonaws.com/test",
+        "_return_address": null,
+        "_api_username": "test_env@gmail.com"
+      }
+    ],
+    "_currency": {
+      "currency_name_short": "GBP",
+      "currency_prefix_d": "£",
+      "currency_prefix_c": "p",
+      "currency_name_long": "British Pounds",
+      "min_recharge_amount": "10.00",
+      "max_recharge_amount": "5000.00"
+    }
+  }
+}
