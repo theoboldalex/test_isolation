@@ -1,30 +1,74 @@
 <?php
 
-declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
 use App\SendMail;
 use ClickSend\Api\PostLetterApi;
 use ClickSend\Model\PostLetter;
 use ClickSend\Model\PostRecipient;
+use Exception;
 use Generator;
+use PHPUnit\Framework\TestCase;
+
+use function file_get_contents;
+use function json_encode;
 
 class SendMailTest extends TestCase
 {
-    const LETTER_PATH = __DIR__ . '/../fixtures/letters/';
-
-    /** @dataProvider letterDataProvider */
+    /**
+     * @param  string[] $recipientData
+     * @param  string[] $expected
+     *
+     * @throws Exception
+     *
+     * @dataProvider letterDataProvider
+     */
     public function testSendingALetter(
         array $recipientData,
         string $fileUrl,
         array $expected,
     ): void {
         // Arrange
-        $apiMock = $this->createMock(PostLetterApi::class);
+        $apiMock       = $this->createMock(PostLetterApi::class);
         $recipientMock = $this->createMock(PostRecipient::class);
-        $letterMock = $this->createMock(PostLetter::class);
+        $letterMock    = $this->createMock(PostLetter::class);
+
+        $recipientMock->expects($this->once())
+            ->method('setAddressName')
+            ->with($recipientData['address_name']);
+
+        $recipientMock->expects($this->once())
+            ->method('setAddressLine1')
+            ->with($recipientData['address_line_one']);
+
+        $recipientMock->expects($this->once())
+            ->method('setAddressLine2')
+            ->with($recipientData['address_line_two']);
+
+        $recipientMock->expects($this->once())
+            ->method('setAddressCity')
+            ->with($recipientData['address_city']);
+
+        $recipientMock->expects($this->once())
+            ->method('setAddressState')
+            ->with($recipientData['address_state']);
+
+        $recipientMock->expects($this->once())
+            ->method('setAddressPostalCode')
+            ->with($recipientData['address_postal_code']);
+
+        $recipientMock->expects($this->once())
+            ->method('setAddressCountry')
+            ->with($recipientData['address_country']);
+
+        $letterMock->expects($this->once())
+            ->method('setFileUrl')
+            ->with($fileUrl);
+
+        $letterMock->expects($this->once())
+            ->method('setRecipients')
+            ->with([$recipientMock]);
 
         $apiMock->expects($this->once())
             ->method('postLettersSendPost')
@@ -33,20 +77,17 @@ class SendMailTest extends TestCase
         // $sut = System Under Test aka the class/module we are isolating as a unit
         $sut = new SendMail(
             $apiMock,
-            $recipientMock, 
+            $recipientMock,
             $letterMock,
         );
 
+        // Act
         $sut->setRecipient($recipientData);
         $sut->attachLetter($fileUrl);
-
-        // Act
-        $result = json_decode($sut->sendLetter(), true);
+        $result = $sut->sendLetter();
 
         // Assert
-        foreach ($expected as $value) {
-            $this->assertContains($value, $result);
-        }
+        $this->assertJson($result, json_encode($expected));
     }
 
     public function letterDataProvider(): Generator
@@ -63,16 +104,15 @@ class SendMailTest extends TestCase
             ],
             'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
             [
-                'http_code' => 200,
+                'http_code' => '200',
                 'response_code' => 'SUCCESS',
                 'response_msg' => 'Letters queued for delivery.',
-            ]
+            ],
         ];
     }
 
-    private function getMockResponse()
+    private function getMockResponse(): bool|string
     {
         return file_get_contents(__DIR__ . '/fixtures/responses/send_letter_response.json');
     }
 }
-

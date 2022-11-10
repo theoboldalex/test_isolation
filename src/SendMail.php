@@ -5,23 +5,25 @@ declare(strict_types=1);
 namespace App;
 
 use ClickSend\Api\PostLetterApi;
-use ClickSend\Configuration;
+use ClickSend\ApiException;
 use ClickSend\Model\PostLetter;
 use ClickSend\Model\PostRecipient;
-use Dotenv\Dotenv;
 use Exception;
-use GuzzleHttp\Client;
 
 class SendMail
 {
     public function __construct(
-        private PostLetterApi $apiInstance,
-        private PostRecipient $postRecipient,
-        private PostLetter $postLetter,
+        private readonly PostLetterApi $apiInstance,
+        private readonly PostRecipient $postRecipient = new PostRecipient(),
+        private readonly PostLetter $postLetter = new PostLetter(),
     ) {
     }
 
-    /** @param string[] $recipient */
+    /**
+     * @param string[] $recipient
+     *
+     * @throws Exception
+     */
     public function setRecipient(array $recipient): void
     {
         if (! $this->validateRecipientFields($recipient)) {
@@ -43,11 +45,13 @@ class SendMail
         $this->postLetter->setRecipients([$this->postRecipient]);
     }
 
+    /** @throws ApiException */
     public function sendLetter(): string
     {
         return $this->apiInstance->postLettersSendPost($this->postLetter);
     }
 
+    /** @param string[] $recipient */
     private function validateRecipientFields(array $recipient): bool
     {
         return true;
