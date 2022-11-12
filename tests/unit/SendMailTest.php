@@ -1,93 +1,72 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\SendMail;
+use App\Letter;
+use App\MailSender;
 use ClickSend\Api\PostLetterApi;
-use ClickSend\Model\PostLetter;
 use ClickSend\Model\PostRecipient;
 use Exception;
 use Generator;
 use PHPUnit\Framework\TestCase;
 
 use function file_get_contents;
-use function json_encode;
+use function json_decode;
 
 class SendMailTest extends TestCase
 {
     /**
-     * @param  string[] $recipientData
-     * @param  string[] $expected
+     * @param  string[]        $recipient
+     * @param  PostRecipient[] $result
      *
      * @throws Exception
      *
      * @dataProvider letterDataProvider
      */
-    public function testSendingALetter(
-        array $recipientData,
-        string $fileUrl,
-        array $expected,
+    public function testLetterCanHaveARecipient(
+        array $recipient,
+        array $result,
     ): void {
-        // Arrange
-        $apiMock       = $this->createMock(PostLetterApi::class);
-        $recipientMock = $this->createMock(PostRecipient::class);
-        $letterMock    = $this->createMock(PostLetter::class);
+        $sut = new Letter();
 
-        $recipientMock->expects($this->once())
-            ->method('setAddressName')
-            ->with($recipientData['address_name']);
+        $sut->setRecipient($recipient);
 
-        $recipientMock->expects($this->once())
-            ->method('setAddressLine1')
-            ->with($recipientData['address_line_one']);
+        $this->assertEquals($result, $sut->getRecipients());
+    }
 
-        $recipientMock->expects($this->once())
-            ->method('setAddressLine2')
-            ->with($recipientData['address_line_two']);
+    public function testCanAttachAFileToALetter(): void
+    {
+        $sut     = new Letter();
+        $fileUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
 
-        $recipientMock->expects($this->once())
-            ->method('setAddressCity')
-            ->with($recipientData['address_city']);
+        $sut->attachLetter($fileUrl);
 
-        $recipientMock->expects($this->once())
-            ->method('setAddressState')
-            ->with($recipientData['address_state']);
+        $this->assertSame($fileUrl, $sut->getLetter()->getFileUrl());
+    }
 
-        $recipientMock->expects($this->once())
-            ->method('setAddressPostalCode')
-            ->with($recipientData['address_postal_code']);
-
-        $recipientMock->expects($this->once())
-            ->method('setAddressCountry')
-            ->with($recipientData['address_country']);
-
-        $letterMock->expects($this->once())
-            ->method('setFileUrl')
-            ->with($fileUrl);
-
-        $letterMock->expects($this->once())
-            ->method('setRecipients')
-            ->with([$recipientMock]);
-
+    /** @throws Exception */
+    public function testSendingALetter(): void
+    {
+        $apiMock = $this->createMock(PostLetterApi::class);
         $apiMock->expects($this->once())
             ->method('postLettersSendPost')
             ->willReturn($this->getMockResponse());
 
-        // $sut = System Under Test aka the class/module we are isolating as a unit
-        $sut = new SendMail(
-            $apiMock,
-            $recipientMock,
-            $letterMock,
-        );
+        $sut = new MailSender($apiMock);
 
-        // Act
-        $sut->setRecipient($recipientData);
-        $sut->attachLetter($fileUrl);
-        $result = $sut->sendLetter();
+        $expected = [
+            'http_code' => 200,
+            'response_code' => 'SUCCESS',
+            'response_msg' => 'Letters queued for delivery.',
+        ];
 
-        // Assert
-        $this->assertJson($result, json_encode($expected));
+        $result = json_decode($sut->sendLetter(new Letter()), true);
+
+        foreach ($expected as $key => $value) {
+            $this->assertSame($value, $result[$key]);
+        }
     }
 
     public function letterDataProvider(): Generator
@@ -95,18 +74,26 @@ class SendMailTest extends TestCase
         yield 'send a letter to santa claus' => [
             [
                 'address_name' => 'Santa Claus',
-                'address_line_one' => '1 Lapland Way',
-                'address_line_two' => 'The North Pole',
+                'address_line_1' => '1 Lapland Way',
+                'address_line_2' => 'The North Pole',
                 'address_city' => 'Smorgasborg',
                 'address_state' => 'Phpville',
                 'address_postal_code' => '11111',
                 'address_country' => 'Greenland',
             ],
-            'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
             [
-                'http_code' => '200',
-                'response_code' => 'SUCCESS',
-                'response_msg' => 'Letters queued for delivery.',
+                new PostRecipient([
+                    'address_name' => 'Santa Claus',
+                    'address_line_1' => '1 Lapland Way',
+                    'address_line_2' => 'The North Pole',
+                    'address_city' => 'Smorgasborg',
+                    'address_state' => 'Phpville',
+                    'address_postal_code' => '11111',
+                    'address_country' => 'Greenland',
+                    'return_address_id' => null,
+                    'schedule' => 0,
+                    0 => 'PostRecipient',
+                ]),
             ],
         ];
     }

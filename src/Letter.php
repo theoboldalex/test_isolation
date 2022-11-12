@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace App;
 
-use ClickSend\Api\PostLetterApi;
-use ClickSend\ApiException;
 use ClickSend\Model\PostLetter;
 use ClickSend\Model\PostRecipient;
 use Exception;
 
-class SendMail
+final class Letter
 {
     public function __construct(
-        private readonly PostLetterApi $apiInstance,
         private readonly PostRecipient $postRecipient = new PostRecipient(),
         private readonly PostLetter $postLetter = new PostLetter(),
     ) {
@@ -31,24 +28,29 @@ class SendMail
         }
 
         $this->postRecipient->setAddressName($recipient['address_name']);
-        $this->postRecipient->setAddressLine1($recipient['address_line_one']);
-        $this->postRecipient->setAddressLine2($recipient['address_line_two']);
+        $this->postRecipient->setAddressLine1($recipient['address_line_1']);
+        $this->postRecipient->setAddressLine2($recipient['address_line_2']);
         $this->postRecipient->setAddressCity($recipient['address_city']);
         $this->postRecipient->setAddressState($recipient['address_state']);
         $this->postRecipient->setAddressPostalCode($recipient['address_postal_code']);
         $this->postRecipient->setAddressCountry($recipient['address_country']);
+        $this->postLetter->setRecipients([$this->postRecipient]);
     }
 
     public function attachLetter(string $fileUrl): void
     {
         $this->postLetter->setFileUrl($fileUrl);
-        $this->postLetter->setRecipients([$this->postRecipient]);
     }
 
-    /** @throws ApiException */
-    public function sendLetter(): string
+    public function getLetter(): PostLetter
     {
-        return $this->apiInstance->postLettersSendPost($this->postLetter);
+        return $this->postLetter;
+    }
+
+    /** @return string[] */
+    public function getRecipients(): array
+    {
+        return $this->postLetter->getRecipients();
     }
 
     /** @param string[] $recipient */
